@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Dashboard of CHMI Satellite Department")
+    parser.add_argument('--develop', action='store_true', help='use develop server for debugging')
+    parser.add_argument('--workers', '-w', type=int, default=2,
+                        help='number of workers (production server only, default: 2)')
+    parser.add_argument('--port', '-p', type=int, default=8050,
+                        help='port (default: 8050)')
+    parser.add_argument('--prefix', help='nxing/traefix prefix of the application')
+    parser.add_argument('--path', help='images directory path')
+    parser.add_argument('--georef', help='file path to georeferenced file such as GeoTiff')
+    parser.add_argument('--file_mask', help='mask of the datafiles in the trollsift format, default: '
+                                       '{projection}-{resolution}.{product}.{datetime:%Y%m%d.%H%M}.0.jpg')
+    opts = parser.parse_args()
+
+    if opts.prefix is not None:
+        os.environ['SLT_PREFIX'] = opts.prefix
+
+    if opts.path is not None:
+        os.environ['SLT_DATA_PATH'] = opts.path
+
+    if opts.georef is not None:
+        os.environ['SLT_GEO_PATH'] = opts.georef
+
+    if opts.file_mask is not None:
+        os.environ['SLT_DATA_FILENAME_MASK'] = opts.data_mask
+
+    if opts.develop:
+        from slt.app import run_dev_app
+        run_dev_app(port=opts.port)
+    else:
+        prefix = f'SLT_PREFIX={opts.prefix} ' if opts.prefix else ''
+        os.system(f'{prefix}GUNICORN_CMD_ARGS="--bind 0.0.0.0:{opts.port} --log-level info --workers {opts.workers}" gunicorn slt.app:server')
