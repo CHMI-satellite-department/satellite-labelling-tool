@@ -58,6 +58,13 @@ to the application. This may be done by setting environment variable `SLT_PREFIX
 slt --prefix /slt/
 ```
 
+### Using your own image data
+
+You need to specify the path to your image data and also the path to at least one georeferenced image such as tiff. This may be done by setting both paths `--path` and `--georef`  argument of the run script 
+```shell
+slt --path "path to your image data directory" --georef "path to your gereferenced image"
+```
+
 ## Screenshot
 
 ![Screenshot of app](/slt/assets/screenshot.png)
