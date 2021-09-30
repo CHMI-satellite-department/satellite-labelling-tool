@@ -14,9 +14,9 @@ from .config import _georef
 from .config import _image_file_mask
 
 from .layouts import navbar
-from .layouts import selection_card
-from .layouts import image_annotation_card
-from .layouts import annotated_data_card
+from .layouts import sidebar
+from .layouts import image_annotation
+from .layouts import annotation_table
 
 image_dataloader = StaticImageFolderDataset(
     _data_path,
@@ -53,13 +53,13 @@ app.layout = html.Div(
             [
                 dbc.Row(
                     [
-                        dbc.Col(image_annotation_card.get_layout(image_dataloader), md=10),
-                        dbc.Col(selection_card.get_layout(image_dataloader=image_dataloader), md=2),
+                        dbc.Col(image_annotation.get_layout(image_dataloader), md=10),
+                        dbc.Col(sidebar.get_layout(image_dataloader=image_dataloader), md=2),
                     ],
                     no_gutters=True, justify="start"
                 ),
                 dbc.Row(
-                    dbc.Col(annotated_data_card.get_layout(image_dataloader), md=10),
+                    dbc.Col(annotation_table.get_layout(image_dataloader), md=10),
                     justify="start"),
 
             ],
@@ -68,9 +68,9 @@ app.layout = html.Div(
     ]
 )
 
-image_annotation_card.activate_callbacks(app, image_dataloader)
-annotated_data_card.activate_callbacks(app, image_dataloader, lon_2d_interpolator, lat_2d_interpolator)
-selection_card.activate_callbacks(app, image_dataloader)
+image_annotation.activate_callbacks(app, image_dataloader)
+annotation_table.activate_callbacks(app, image_dataloader, lon_2d_interpolator, lat_2d_interpolator)
+sidebar.activate_callbacks(app, image_dataloader)
 navbar.activate_callbacks(app)
 
 
