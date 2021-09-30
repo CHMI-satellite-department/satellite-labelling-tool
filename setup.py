@@ -13,7 +13,7 @@ setuptools.setup(
     author='Jindrich Stastka, Jakub Seidl, Blanka Gvozdikova',
     author_email='jindrich.stastka@chmi.cz, jakub.seidl@email.cz, blanka.gvozdikova@chmi.cz',
     classifiers=['Programming Language :: Python :: 3.7'],
-    packages=['slt'],
+    packages=setuptools.find_packages(),
     install_requires=[
         'dash==2.0.0',
         'dash-bootstrap-components==0.13.0',
