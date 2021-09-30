@@ -1,4 +1,3 @@
-import dash
 from dash import dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
@@ -59,7 +58,6 @@ def activate_callbacks(app, image_dataloader):
             fig = make_facet_fig(image_dataloader, image_files_data["current"], shapes=None,
                                  annotation_type=annotation_type)
             return (fig, annotations_store)
-
 
         timestamp = frame_timestamp(image_dataloader, image_files_data["current"])
         # convert table rows to those understood by fig.update_layout

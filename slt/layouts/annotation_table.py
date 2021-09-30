@@ -9,6 +9,7 @@ import re
 from ..utils import frame_timestamp, time_passed
 
 from ..config import annotation_types, columns
+from ..config import color_dict
 from ..config import download_columns
 from ..config import type_dict
 
@@ -171,7 +172,9 @@ def activate_callbacks(app, image_dataloader, lon_interpolator, lat_interpolator
                 # this means a shape was updated (e.g., by clicking and dragging its
                 # vertices), so we just update the specific shape
                 annotations_table_data = annotations_table_shape_resize(
-                    annotations_table_data, graph_relayout_data
+                    annotations_table_data, graph_relayout_data,
+                    lon_interpolator=lon_interpolator,
+                    lat_interpolator=lat_interpolator
                 )
             if annotations_table_data is None:
                 return dash.no_update
@@ -201,23 +204,32 @@ def coord_to_tab_column(coord):
     return coord.upper()
 
 
-def annotations_table_shape_resize(annotations_table_data, fig_data):
+def annotations_table_shape_resize(annotations_table_data, fig_data, lon_interpolator, lat_interpolator):
     """
     Extract the shape that was resized (its index) and store the resized
     coordinates.
     """
+    shapes = {}
     for key in fig_data.keys():
         shape_nb, coord = key.split(".")
         # shape_nb is for example 'shapes[2].x0': this extracts the number
-        shape_nb = shape_nb.split(".")[0].split("[")[-1].split("]")[0]
+        shape_nb = int(shape_nb.split(".")[0].split("[")[-1].split("]")[0])
         # this should correspond to the same row in the data table
         # we have to format the float here because this is exactly the entry in
         # the table
-        annotations_table_data[int(shape_nb)][
-            coord_to_tab_column(coord)
-        ] = fig_data[key]
         # (no need to compute a time stamp, that is done for any change in the
         # table values, so will be done later)
+        shapes.setdefault(shape_nb, {v: annotations_table_data[shape_nb][coord_to_tab_column(v)]
+                                     for v in ['x0', 'y0', 'x1', 'y1', 'xref', 'yref']})
+        shapes[shape_nb]['line'] = {'color': color_dict[annotations_table_data[shape_nb]['label']]}
+        shapes[shape_nb][coord] = fig_data[key]
+    for index, shape in shapes.items():
+        annotations_table_data[index] = shape_to_table_row(
+            shape,
+            annotator_name=shape.get('annotator', ''),
+            lon_interpolator=lon_interpolator,
+            lat_interpolator=lat_interpolator
+        )
     return annotations_table_data
 
 
