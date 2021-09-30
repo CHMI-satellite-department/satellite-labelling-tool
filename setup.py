@@ -19,6 +19,7 @@ setuptools.setup(
         'dash-bootstrap-components==0.13.0',
         'gunicorn==20.1.0',
         'numpy>=1.19',
+        'orjson==3.6.3',
         'pandas==1.1.2',
         'plotly==5.3.1',
         'scikit-image==0.18.3',
