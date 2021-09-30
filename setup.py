@@ -23,7 +23,7 @@ setuptools.setup(
         'plotly==5.3.1',
         'scikit-image==0.18.3',
         'scipy==1.7.1',
-        'satellite-dataloader @ git+https://li-gitlab.chmi.cz/js/satellite-dataloader@develop#egg=satellite-dataloader'
+        'satellite-dataloader @ git+https://github.com/CHMI-satellite-department/satellite-dataloader@develop#egg=satellite-dataloader'
     ],
     scripts=['bin/slt'],
     include_package_data=True,

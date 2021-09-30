@@ -6,4 +6,4 @@ pandas==1.3.2
 plotly==5.3.1
 scikit-image==0.18.3
 scipy==1.7.1
--e git+https://li-gitlab.chmi.cz/js/satellite-dataloader@develop#egg=satellite-dataloader
+-e git+https://github.com/CHMI-satellite-department/satellite-dataloader@develop#egg=satellite-dataloader
