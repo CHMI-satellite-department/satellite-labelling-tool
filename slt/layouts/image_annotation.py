@@ -34,7 +34,7 @@ def get_layout(image_dataloader, **kwargs):
 
                     dcc.Graph(
                         id="graph",
-                        figure=make_facet_fig(image_dataloader, 0),
+                        figure=make_facet_fig(image_dataloader, 0, annotation_type=DEFAULT_ATYPE),
                         config={"modeBarButtonsToAdd": ["drawrect", "eraseshape"]},
                         style={'width': '100%', 'height': '85vh'}
                     ),
@@ -54,40 +54,46 @@ def activate_callbacks(app, image_dataloader):
     def send_figure_to_graph(
             annotations_table_data, annotation_type, image_files_data, annotations_store
     ):
-        if annotations_table_data is not None:
-            timestamp = frame_timestamp(image_dataloader, image_files_data["current"])
-            # convert table rows to those understood by fig.update_layout
-            fig_shapes = [table_row_to_shape(sh) for sh in annotations_table_data]
-            # find the shapes that are new
-            new_shapes_i = []
-            old_shapes_i = []
-            for i, sh in enumerate(fig_shapes):
-                if not shape_in(annotations_store[timestamp]["shapes"])(sh):
-                    new_shapes_i.append(i)
-                else:
-                    old_shapes_i.append(i)
-            # add timestamps to the new shapes
-            for i in new_shapes_i:
-                fig_shapes[i]["timestamp"] = time_passed(annotations_store["starttime"])
-            # find the old shapes and look up their timestamps
-            for i in old_shapes_i:
-                old_shape_i = index_of_shape(
-                    annotations_store[timestamp]["shapes"], fig_shapes[i]
-                )
-                fig_shapes[i]["timestamp"] = annotations_store[timestamp]["shapes"][
-                    old_shape_i
-                ]["timestamp"]
-            shapes = fig_shapes
-
-            fig = make_facet_fig(image_dataloader, image_files_data["current"], shapes=shapes,
+        if annotations_table_data is None:
+            # no labels -> just update the annotation type
+            fig = make_facet_fig(image_dataloader, image_files_data["current"], shapes=None,
                                  annotation_type=annotation_type)
-
-            annotations_store[timestamp]["shapes"] = shapes
             return (fig, annotations_store)
-        return dash.no_update
 
 
-def make_facet_fig(image_dataloader, i: int, shapes=None, annotation_type=DEFAULT_ATYPE):
+        timestamp = frame_timestamp(image_dataloader, image_files_data["current"])
+        # convert table rows to those understood by fig.update_layout
+        fig_shapes = [table_row_to_shape(sh) for sh in annotations_table_data]
+        # find the shapes that are new
+        new_shapes_i = []
+        old_shapes_i = []
+        for i, sh in enumerate(fig_shapes):
+            if not shape_in(annotations_store[timestamp]["shapes"])(sh):
+                new_shapes_i.append(i)
+            else:
+                old_shapes_i.append(i)
+        # add timestamps to the new shapes
+        for i in new_shapes_i:
+            fig_shapes[i]["timestamp"] = time_passed(annotations_store["starttime"])
+        # find the old shapes and look up their timestamps
+        for i in old_shapes_i:
+            old_shape_i = index_of_shape(
+                annotations_store[timestamp]["shapes"], fig_shapes[i]
+            )
+            fig_shapes[i]["timestamp"] = annotations_store[timestamp]["shapes"][
+                old_shape_i
+            ]["timestamp"]
+        shapes = fig_shapes
+
+        fig = make_facet_fig(image_dataloader, image_files_data["current"], shapes=shapes,
+                             annotation_type=annotation_type)
+
+        annotations_store[timestamp]["shapes"] = shapes
+
+        return (fig, annotations_store)
+
+
+def make_facet_fig(image_dataloader, i: int, annotation_type, shapes=None):
     data, lat, lon = dl2np(image_dataloader[i])
     fig = px.imshow(data, facet_col=0, binary_string=True,
                     facet_col_wrap=2, facet_row_spacing=0.0001, facet_col_spacing=0.01,
