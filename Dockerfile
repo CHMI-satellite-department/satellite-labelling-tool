@@ -31,6 +31,7 @@ USER slt
 
 # --- install application
 COPY --chown=slt:slt . ./slt/
+RUN chmod +x ./slt/bin/*
 ENV PATH="/app/slt/bin:${PATH}"
 ENV PYTHONPATH="/app/slt:${PYTHONPATH}"
 
